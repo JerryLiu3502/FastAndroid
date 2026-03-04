@@ -324,12 +324,6 @@ android {
     }
 
 
-    dexOptions {
-        // 声明是否对依赖的库进行 dex 预处理来使你的增量构建更快速
-        preDexLibraries true
-        // 设置最大的线程数量使用当运行 dex-in-process 时,默认值是 4
-        maxProcessCount 8
-    }
 }
 
 ruler {

@@ -113,11 +113,11 @@ object Libs {
 
         "com.youth.banner:banner:2.1.0",
 
-        "com.github.Justson.AgentWeb:agentweb-core:v4.1.9",
+        "com.github.Justson.AgentWeb:agentweb-core:4.1.9",
         "com.squareup.picasso:picasso:2.5.2",
         "com.github.lzyzsd:jsbridge:1.0.4",
         "com.github.markzhai:blockcanary-android:1.5.0",
-        "com.squareup.leakcanary:leakcanary-support-fragment:1.6.3",
+        "com.squareup.leakcanary:leakcanary-android-no-op:1.6.3",
         "com.permissionx.guolindev:permissionx:1.4.0",
         "dev.b3nedikt.viewpump:viewpump:4.0.7",
 

@@ -112,9 +112,15 @@ allprojects {
 
 String SDK_DIR = System.getenv("ANDROID_SDK_HOME")
 if (SDK_DIR == null) {
-    Properties props = new Properties()
-    props.load(new FileInputStream(project.rootProject.file("local.properties")))
-    SDK_DIR = props.get('sdk.dir');
+    SDK_DIR = System.getenv("ANDROID_SDK_ROOT")
+}
+if (SDK_DIR == null) {
+    File localPropertiesFile = project.rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        Properties props = new Properties()
+        localPropertiesFile.withInputStream { props.load(it) }
+        SDK_DIR = props.getProperty('sdk.dir')
+    }
 }
 
 
