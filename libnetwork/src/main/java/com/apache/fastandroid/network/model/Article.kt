@@ -11,6 +11,7 @@ import java.io.Serializable
  * Time: 21:10
  */
 data class Article(
+    var id: Int = 0,
     var author: String = "",
     var shareUser: String = "",
     var chapterName: String? = "",
@@ -23,5 +24,6 @@ data class Article(
     var fresh: Boolean = false,
     var top: Boolean = false,
 
-    val loadAuthorInfo:() -> Unit?= {}
-):Serializable
+    // 预解析好的标题（fromHtml 结果），在数据转换阶段算一次，避免每次 bind 重复解析
+    var displayTitle: String = ""
+) : Serializable

@@ -3,6 +3,7 @@ package com.apache.fastandroid.home
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.apache.fastandroid.R
 import com.apache.fastandroid.databinding.ArticleItemBinding
 import com.apache.fastandroid.network.model.Article
@@ -11,7 +12,6 @@ import com.chad.library.adapter.base.module.LoadMoreModule
 import com.chad.library.adapter.base.viewholder.BaseDataBindingHolder
 import com.tesla.framework.common.util.CommonUtil
 import com.tesla.framework.common.util.LaunchTimer
-import com.tesla.framework.common.util.N
 import com.tesla.framework.common.util.buildSpannableString
 import com.tesla.framework.kt.getColor
 import com.tesla.framework.kt.isNotNullOrEmpty
@@ -32,6 +32,19 @@ class ArticleAdapter(
 
     init {
         setHasStableIds(true)
+    }
+
+    override fun getItemId(position: Int): Long {
+        if (position !in data.indices) {
+            return RecyclerView.NO_ID
+        }
+
+        val article = data[position]
+        if (article.id != 0) {
+            return article.id.toLong()
+        }
+
+        return "${article.link}_${article.title}_${article.niceDate}".hashCode().toLong()
     }
 
 
@@ -58,7 +71,8 @@ class ArticleAdapter(
             .setImageResource(R.id.item_list_collect, isCollect(article))
 
 
-        holder.getView<TextView>(R.id.item_article_author).buildSpannableString {
+        val authorView = holder.getView<TextView>(R.id.item_article_author)
+        authorView.buildSpannableString {
             if (article.top) {
                 append("置顶  ") {
                     setColor(R.color.holo_red_light.getColor(context))
@@ -72,53 +86,37 @@ class ArticleAdapter(
             append(handleAuthor(article))
         }
 
-        // 模拟卡顿
-        // Thread.sleep(100)
-
-        holder.getView<TextView>(R.id.item_article_author).setOnClickListener {
-            // 方式1 使用回调接口，在 fragment 中调用viewmodel 中的接口
-            //
-//            listener?.invoke(it, holder.layoutPosition)
-            article.loadAuthorInfo()
-        }
-        holder.getView<TextView>(R.id.item_article_author).setOnClickListener {
-//            listener?.invoke(it, holder.layoutPosition)
-            article.loadAuthorInfo()
+        // 作者点击通过 listener 回传给 Fragment 处理，避免把回调耦合进实体
+        authorView.setOnClickListener {
+            listener(it, holder.bindingAdapterPosition)
         }
     }
-
-    override fun getItemViewType(position: Int): Int {
-        return R.id.item_article_type
-    }
-
 
     private fun handleTitle(article: Article?): String {
-        return if (article != null) {
-            CommonUtil.fromHtml(article.title)
-                .toString()
-        } else ""
+        if (article == null) return ""
+        // 优先用转换阶段预解析好的标题，缺省时再兜底解析一次
+        return article.displayTitle.ifEmpty { CommonUtil.fromHtml(article.title).toString() }
     }
 
     private fun handleAuthor(article: Article): String {
-        if (article.author.isNotNullOrEmpty() && article.shareUser.isNotNullOrEmpty()) {
-            return "匿名用户"
-        } else if (N.isEmpty(article.author)) {
-            return "作者" + article.shareUser
-        } else if (N.isEmpty(article.shareUser)) {
-            return "作者" + article.author
+        return when {
+            // 官方/原创文章优先展示作者
+            article.author.isNotNullOrEmpty() -> "作者" + article.author
+            // 广场分享文章展示分享人
+            article.shareUser.isNotNullOrEmpty() -> "分享人" + article.shareUser
+            else -> "匿名用户"
         }
-        return ""
     }
 
     private fun handleCategory(article: Article): String {
-        if (N.isEmpty(article.superChapterName) && N.isEmpty(article.chapterName)) {
-            return ""
-        } else if (article.superChapterName.isNullOrEmpty()) {
-            return "作者" + article.chapterName
-        } else if (article.chapterName.isNullOrEmpty()) {
-            return "作者" + article.superChapterName
+        val superName = article.superChapterName
+        val chapterName = article.chapterName
+        return when {
+            superName.isNullOrEmpty() && chapterName.isNullOrEmpty() -> ""
+            superName.isNullOrEmpty() -> chapterName.orEmpty()
+            chapterName.isNullOrEmpty() -> superName
+            else -> "$superName·$chapterName"
         }
-        return ""
     }
 
     private fun isCollect(article: Article): Int {

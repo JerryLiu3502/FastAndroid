@@ -113,7 +113,8 @@ object Libs {
 
         "com.youth.banner:banner:2.1.0",
 
-        "com.github.Justson.AgentWeb:agentweb-core:v4.1.9",
+        // 注意：jitpack 上带 v 前缀的 tag(v4.1.9)构建失败、拉不到，须用不带 v 的 4.1.9
+        "com.github.Justson.AgentWeb:agentweb-core:4.1.9",
         "com.squareup.picasso:picasso:2.5.2",
         "com.github.lzyzsd:jsbridge:1.0.4",
         "com.github.markzhai:blockcanary-android:1.5.0",

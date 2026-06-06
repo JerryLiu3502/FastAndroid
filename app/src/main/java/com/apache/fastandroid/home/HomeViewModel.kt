@@ -6,6 +6,7 @@ import com.apache.fastandroid.jetpack.BaseViewModel
 import com.apache.fastandroid.network.model.Article
 import com.apache.fastandroid.network.model.ArticleApi
 import com.apache.fastandroid.network.model.HomeArticleResponse
+import com.tesla.framework.common.util.CommonUtil
 import com.tesla.framework.component.logger.Logger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -50,7 +51,7 @@ class HomeViewModel(
     }
 
     fun loadData(forceUpdate: Boolean) {
-        _forceUpdate.postValue(true)
+        _forceUpdate.postValue(forceUpdate)
     }
 
     fun loadAuthorInfo(authorId: String) {
@@ -74,12 +75,11 @@ class HomeViewModel(
             try {
                 val articles: MutableList<ArticleApi> = arrayListOf()
 
+                // 两个请求互不依赖，先一起启动再分别 await，真正并行
                 val topData = async { loadTopArticle() }
-
-                topData.await()?.let {
-                    articles.addAll(it)
-                }
                 val hotData = async { loadHotData() }
+
+                articles.addAll(topData.await())
                 hotData.await().datas?.let {
                     articles.addAll(it)
                 }
@@ -120,6 +120,7 @@ class HomeViewModel(
     private fun convertToArticle(api: ArticleApi): Article {
         return api.let {
             Article(
+                id = it.id,
                 author = it.author,
                 shareUser = it.shareUser,
                 chapterName = it.chapterName,
@@ -130,10 +131,7 @@ class HomeViewModel(
                 niceDate = it.niceDate,
                 fresh = it.fresh,
                 top = it.top,
-                loadAuthorInfo = {
-                    loadAuthorInfo(api.author)
-                }
-
+                displayTitle = CommonUtil.fromHtml(it.title).toString()
             )
         }
     }
@@ -143,6 +141,7 @@ class HomeViewModel(
 fun ArticleApi.toArticle(): Article {
     return this.let {
         Article(
+            id = it.id,
             author = it.author,
             shareUser = it.shareUser,
             chapterName = it.chapterName,
@@ -153,7 +152,7 @@ fun ArticleApi.toArticle(): Article {
             niceDate = it.niceDate,
             fresh = it.fresh,
             top = it.top,
-
-            )
+            displayTitle = CommonUtil.fromHtml(it.title).toString()
+        )
     }
 }
