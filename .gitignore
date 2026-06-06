@@ -123,3 +123,19 @@ tmp/
 
 # TeXlipse plugin
 .texlipseXml version="1.0" encoding="UTF-8"?>captures
+
+# ===== 签名 / 密钥 / 敏感配置（勿入库；本地保留，分发走带外渠道）=====
+/sign/
+*.jks
+*.keystore
+*.p12
+*.pfx
+prod.properties
+keystore.properties
+signing.properties
+.env
+.env.*
+
+# Claude Code 本机覆盖与 Hook 生成的审计日志
+.claude/settings.local.json
+.claude/hooks/audit.log
