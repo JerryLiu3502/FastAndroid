@@ -360,6 +360,7 @@ open class RxJava3PracticeFragment:BaseBindingFragment<FragmentRxjava3PracticeBi
         return Observable.create<AuthToken> { emitter ->
             Logger.d("God!!! Token is out of date. nstart refresh token...... --->")
 //            textview.append("God!!! Token is out of date. \nstart refresh token......");
+            // 仅为演示「刷新 token」流程的占位假值，非真实凭证，切勿据此误判为硬编码密钥
             token = "asdfafea145tadsf"
             emitter.onNext(AuthToken(token!!))
             emitter.onComplete()
