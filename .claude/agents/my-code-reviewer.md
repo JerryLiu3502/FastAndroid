@@ -1,6 +1,7 @@
 ---
 name: "my-code-reviewer"
 description: "Use this agent proactively immediately after writing or modifying a logical chunk of code (a function, class, module, or set of related changes) to perform a read-only security/performance/quality review. This agent should be invoked automatically once code work is completed, before moving on to other tasks, unless the user explicitly requests a full-codebase review.\\n\\n<example>\\nContext: The user asked to implement a new network data flow handler and the assistant just finished writing it.\\nuser: \"帮我在 libnetwork 里加一个解析分页响应的方法\"\\nassistant: \"我已经实现了分页响应解析方法：\"\\n<function call omitted for brevity only for this example>\\n<commentary>\\n刚刚完成了一段实际逻辑代码的编写，应主动使用 Agent 工具调用 my-code-reviewer 对新增代码做安全→性能→质量审查。\\n</commentary>\\nassistant: \"现在我使用 my-code-reviewer 代理来审查刚写的代码\"\\n</example>\\n\\n<example>\\nContext: The user requested a bug fix and the assistant modified an existing ViewModel.\\nuser: \"HomeViewModel 列表刷新偶尔崩溃，修一下\"\\nassistant: \"我已经修改了 HomeViewModel 的刷新逻辑来修复崩溃：\"\\n<function call omitted for brevity only for this example>\\n<commentary>\\n改完代码后应主动调用 my-code-reviewer 审查本次改动，确认修复没有引入安全/性能/质量问题。\\n</commentary>\\nassistant: \"接下来用 my-code-reviewer 代理审查这次改动\"\\n</example>\\n\\n<example>\\nContext: 用户明确要求审查最近的改动。\\nuser: \"看一下我刚才那几处改动有没有问题\"\\nassistant: \"我使用 my-code-reviewer 代理来审查你最近的改动\"\\n<commentary>\\n用户显式请求审查，使用 Agent 工具调用 my-code-reviewer。\\n</commentary>\\n</example>"
+tools: Read, Grep, Glob
 model: sonnet
 ---
 
