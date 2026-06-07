@@ -37,10 +37,19 @@ refspec 强推（`push +src:dst`）、`git branch -D/-d/--delete`、`git tag -d`
 覆盖，或把对应 `hooks` 项留空即可。
 
 ## 自测
+回归测试（断言式，任一失败则非零退出）：
+```bash
+bash .claude/hooks/test.sh
+```
+覆盖：破坏性 git 拦截、**git 全局选项绕过回归**（`git -C <path> reset --hard` 等）、
+正常 git 放行、敏感文件 deny（含大小写/相对路径）、新建 .java→ask、现有 .java 放行、
+SessionStart 输出合法。改 Hook 后请先跑通本测试。
+
+单条手动验证：
 ```bash
 export CLAUDE_PROJECT_DIR="$PWD"
 echo '{"tool_input":{"file_path":"/x/sign/a.keystore"}}' | .claude/hooks/protect-sensitive-files.sh
-echo '{"tool_input":{"command":"git reset --hard"}}'     | .claude/hooks/guard-git.sh
+echo '{"tool_input":{"command":"git -C /tmp reset --hard"}}' | .claude/hooks/guard-git.sh
 echo '{"tool_input":{"file_path":"/x/New.java"}}'        | .claude/hooks/kotlin-first.sh
 .claude/hooks/session-context.sh </dev/null | jq .
 ```
